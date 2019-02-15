@@ -1,15 +1,20 @@
 import json
+import os
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from handlers import start, get_section, unknown
 
-with open('config.json', encoding='utf-8') as config_file:
-    config_data = json.loads(config_file.read())
-
-telegram_bot_token = config_data.get('TELEGRAM_BOT_TOKEN')
+# environment variable is more priority than config. TODO fix it.
+telegram_bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
 if telegram_bot_token is None:
-    print("Set telegram bot token in 'config.json' file")
+    with open('config.json', encoding='utf-8') as config_file:
+        config_data = json.loads(config_file.read())
+
+    telegram_bot_token = config_data.get('TELEGRAM_BOT_TOKEN')
+
+if telegram_bot_token is None:
+    print("Set telegram bot token in global environment or 'config.json' file")
     exit(1)
 
 bot_updater = Updater(token=telegram_bot_token)
